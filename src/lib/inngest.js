@@ -2,8 +2,10 @@ import { Inngest } from "inngest";
 import User from "../models/User.js";
 import { connectDB } from "./db.js";
 
-export const inngest = new Inngest({ id: "Talent-IQ" });
-
+export const inngest = new Inngest({
+  id: "Talent-IQ",
+  eventKey: process.env.INNGEST_EVENT_KEY,
+});
 const syncUser = inngest.createFunction(
   { id: "sync-user" },
   { event: "clerk/user.created" },
