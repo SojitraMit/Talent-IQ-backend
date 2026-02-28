@@ -1,10 +1,17 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./lib/db.js";
+import cors from "cors";
+import { serve } from "inngest/express";
+import { inngest, functions } from "./lib/inngest.js";
 
 dotenv.config();
 
 const app = express();
+
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+
+app.use("/api/inngest", serve({ client: inngest, functions }));
 
 app.get("/", (req, res) => {
   res.send("Hello World");
