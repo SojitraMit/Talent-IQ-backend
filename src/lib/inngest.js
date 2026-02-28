@@ -2,6 +2,18 @@ import { Inngest } from "inngest";
 import User from "../models/User.js";
 import { connectDB } from "./db.js";
 
+console.log("🚀 Inngest Init:");
+console.log("  EVENT_KEY present:", !!process.env.INNGEST_EVENT_KEY);
+console.log("  SIGNING_KEY present:", !!process.env.INNGEST_SIGNING_KEY);
+console.log(
+  "  SIGNING_KEY length:",
+  process.env.INNGEST_SIGNING_KEY?.length || 0,
+);
+console.log(
+  "  SIGNING_KEY first 10 chars:",
+  process.env.INNGEST_SIGNING_KEY?.substring(0, 10) || "NOT SET",
+);
+
 export const inngest = new Inngest({
   id: "Talent-IQ",
   eventKey: process.env.INNGEST_EVENT_KEY,
