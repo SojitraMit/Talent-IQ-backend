@@ -6,6 +6,7 @@ export const inngest = new Inngest({
   id: "Talent-IQ",
   eventKey: process.env.INNGEST_EVENT_KEY,
 });
+
 const syncUser = inngest.createFunction(
   { id: "sync-user" },
   { event: "clerk/user.created" },
