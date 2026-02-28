@@ -13,6 +13,24 @@ const app = express();
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json()); // 🔥 THIS WAS MISSING
 
+// 🔍 Debug middleware: Log Inngest requests (remove in production)
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/inngest")) {
+    console.log("🔐 Inngest Request Headers:");
+    console.log("  x-inngest-signature:", req.headers["x-inngest-signature"]);
+    console.log(
+      "  x-inngest-server-kind:",
+      req.headers["x-inngest-server-kind"],
+    );
+    console.log(
+      "  env INNGEST_SIGNING_KEY present:",
+      !!process.env.INNGEST_SIGNING_KEY,
+    );
+    console.log("  Request body length:", JSON.stringify(req.body).length);
+  }
+  next();
+});
+
 // ✅ Inngest route
 app.use(
   "/api/inngest",

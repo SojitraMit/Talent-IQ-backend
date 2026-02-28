@@ -5,6 +5,7 @@ import { connectDB } from "./db.js";
 export const inngest = new Inngest({
   id: "Talent-IQ",
   eventKey: process.env.INNGEST_EVENT_KEY,
+  signingKey: process.env.INNGEST_SIGNING_KEY, // ✅ Required for signature verification
 });
 
 const syncUser = inngest.createFunction(
