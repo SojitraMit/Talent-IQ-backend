@@ -1,6 +1,7 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
 import { connectDB } from "./db.js";
+import { deleteStreamUser, upsertStreamUser } from "./stream.js";
 
 console.log("🚀 Inngest Init:");
 console.log("  EVENT_KEY present:", !!process.env.INNGEST_EVENT_KEY);
@@ -34,6 +35,12 @@ const syncUser = inngest.createFunction(
       profileImage: image_url,
     });
     await user.save();
+
+    await upsertStreamUser({
+      id: id.toString(),
+      name: user.name,
+      profileImage: user.profileImage,
+    });
   },
 );
 
@@ -44,6 +51,8 @@ const deleteUserFromDB = inngest.createFunction(
     await connectDB();
     const { id } = event.data;
     await User.deleteOne({ clerkId: id });
+
+    await deleteStreamUser(id.toString());
   },
 );
 
