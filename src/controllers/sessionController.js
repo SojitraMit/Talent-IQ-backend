@@ -23,7 +23,7 @@ export async function createSession(req, res) {
 
     await streamClient.video.call("default", callId).getOrCreate({
       data: {
-        created_by: clerkId,
+        created_by: { id: clerkId },
         custom: {
           sessionId: session._id.toString(),
           problem,
@@ -48,8 +48,9 @@ export async function createSession(req, res) {
 
 export async function getActiveSessions(req, res) {
   try {
-    const sessions = Session.find({ status: "active" })
+    const sessions = await Session.find({ status: "active" })
       .populate("host", "name profileImage email clerkId")
+      .populate("participant", "name profileImage email clerkId")
       .sort({ createdAt: -1 })
       .limit(20);
     res.status(200).json({ sessions });
@@ -102,6 +103,20 @@ export async function joinSession(req, res) {
       return res.status(404).json({ message: "Session not found" });
     }
 
+    if (session.status !== "active") {
+      return res.status(400).json({ message: "Session is not active" });
+    }
+
+    if (session.host.toString() === userId.toString()) {
+      return res
+        .status(400)
+        .json({ message: "You cannot join your own session" });
+    }
+
+    if (session.participant) {
+      return res.status(409).json({ message: "Session is already full" });
+    }
+
     session.participant = userId;
     await session.save();
 
@@ -135,14 +150,14 @@ export async function endSession(req, res) {
       return res.status(400).json({ message: "Session is already completed" });
     }
 
-    session.status = "completed";
-    await session.save();
-
     const call = streamClient.video.call("default", session.callId);
     await call.delete({ hard: true });
 
     const channel = chatClient.channel("messaging", session.callId);
     await channel.delete();
+
+    session.status = "completed";
+    await session.save();
 
     res.status(200).json({ message: "Session ended successfully" });
   } catch (error) {
