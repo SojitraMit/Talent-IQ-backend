@@ -14,7 +14,9 @@ dotenv.config();
 const app = express();
 
 // ✅ MUST COME BEFORE ROUTES
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(
+  cors({ origin: "https://talent-iq-bice.vercel.app", credentials: true }),
+);
 app.use(express.json()); // 🔥 THIS WAS MISSING
 app.use(clerkMiddleware());
 
