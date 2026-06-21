@@ -14,8 +14,23 @@ dotenv.config();
 const app = express();
 
 // ✅ MUST COME BEFORE ROUTES
+const allowedOrigins = [
+  "https://talent-iq-bice.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
 app.use(
-  cors({ origin: "https://talent-iq-bice.vercel.app", credentials: true }),
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
 );
 app.use(express.json()); // 🔥 THIS WAS MISSING
 app.use(clerkMiddleware());
